@@ -4,7 +4,7 @@
  * Plugin URI: https://omukiguy.com
  * Author: Techiepress
  * Author URI: https://omukiguy.com
- * Description: Local Payments Gateway for mobile.
+ * Description: Mundo pagos gateway
  * Version: 0.1.0
  * License: GPL2
  * License URL: http://www.gnu.org/licenses/gpl-2.0.txt
