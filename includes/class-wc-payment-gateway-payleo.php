@@ -78,8 +78,8 @@ class WC_Gateway_MundoPagos extends WC_Payment_Gateway
 		$this->method_title       = __('Mundo pagos', 'payleo-payments-woo');
 		$this->token            = __('Token', 'payleo-payments-woo');
 		$this->id_agreement          = __('Id convenio', 'payleo-payments-woo');
-		$this->urlServiceConection            = __('urlServiceConection', 'payleo-payments-woo');
-		$this->urlRedirect            = __('urlRedirect', 'payleo-payments-woo');
+		$this->urlServiceConection            = __('URL conexión a mundo pagos', 'payleo-payments-woo');
+		$this->urlRedirect            = __('URL redirección a wordpress', 'payleo-payments-woo');
 		$this->method_description = __('Have your customers pay with Mundo pagos Payments.', 'payleo-payments-woo');
 		$this->has_fields         = false;
 	}
@@ -90,7 +90,7 @@ class WC_Gateway_MundoPagos extends WC_Payment_Gateway
 	{
 		$this->form_fields = array(
 			'enabled'            => array(
-				'title'       => __('Enable/Disable', 'payleo-payments-woo'),
+				'title'       => __('Habilitar/Deshabilitar', 'payleo-payments-woo'),
 				'label'       => __('Enable Mundo pagos', 'payleo-payments-woo'),
 				'type'        => 'checkbox',
 				'description' => '',
@@ -99,46 +99,46 @@ class WC_Gateway_MundoPagos extends WC_Payment_Gateway
 			'title'              => array(
 				'title'       => __('Title', 'payleo-payments-woo'),
 				'type'        => 'text',
-				'description' => __('Mundo pagos method description that the customer will see on your checkout.', 'payleo-payments-woo'),
-				'default'     => __('Mundo pagos Payments', 'payleo-payments-woo'),
+				'description' => __('Mundo pagos descripción del método que el cliente verá en su pago.', 'payleo-payments-woo'),
+				'default'     => __('Mundo pagos', 'payleo-payments-woo'),
 				'desc_tip'    => true,
 			),
 			'token'             => array(
 				'title'       => __('Token de seguridad', 'payleo-payments-woo'),
 				'type'        => 'text',
-				'description' => __('token de seguridad', 'payleo-payments-woo'),
+				'description' => __('Token de seguridad del convenio en mundo pagos.', 'payleo-payments-woo'),
 				'desc_tip'    => true,
 			),
 			'id_agreement'           => array(
 				'title'       => __('Id. convenio', 'payleo-payments-woo'),
 				'type'        => 'text',
-				'description' => __('Add id convenio mundo pagos', 'payleo-payments-woo'),
+				'description' => __('Agregar id convenio de mundo pagos', 'payleo-payments-woo'),
 				'desc_tip'    => true,
 			),
 			'urlServiceConection'           => array(
-				'title'       => __('urlServiceConection', 'payleo-payments-woo'),
+				'title'       => __('URL conexión a mundo pagos', 'payleo-payments-woo'),
 				'type'        => 'text',
-				'description' => __('urlServiceConection', 'payleo-payments-woo'),
+				'description' => __('URL conexión, se realiza el proceso de conexión al servicio encargado de crear la factura en mundo pagos..', 'payleo-payments-woo'),
 				'desc_tip'    => true,
 			),
 			'urlRedirect'           => array(
-				'title'       => __('urlRedirect', 'payleo-payments-woo'),
+				'title'       => __('URL redirección a Mundo pagos', 'payleo-payments-woo'),
 				'type'        => 'text',
-				'description' => __('Add id convenio mundo pagos', 'payleo-payments-woo'),
+				'description' => __('URL redirección, cuando se realice el proceso de pago sera redirigido a mundo pagos para procesar el pago', 'payleo-payments-woo'),
 				'desc_tip'    => true,
 			),
 			'description'        => array(
-				'title'       => __('Description', 'payleo-payments-woo'),
+				'title'       => __('Descripción', 'payleo-payments-woo'),
 				'type'        => 'textarea',
-				'description' => __('Mundo pagos Payment method description that the customer will see on your website.', 'payleo-payments-woo'),
-				'default'     => __('Mundo pagos Payments before delivery.', 'payleo-payments-woo'),
+				'description' => __('Mundo pagos descripción del método que el cliente verá en su sitio web. ', 'payleo-payments-woo'),
+				'default'     => __('Mundo pagos.', 'payleo-payments-woo'),
 				'desc_tip'    => true,
 			),
 			'instructions'       => array(
-				'title'       => __('Instructions', 'payleo-payments-woo'),
+				'title'       => __('Instrucciones', 'payleo-payments-woo'),
 				'type'        => 'textarea',
-				'description' => __('Instructions that will be added to the thank you page.', 'payleo-payments-woo'),
-				'default'     => __('Mundo pagos Payments before delivery.', 'payleo-payments-woo'),
+				'description' => __('Instrucciones.', 'payleo-payments-woo'),
+				'default'     => __('Mundo pagos instrucciones.', 'payleo-payments-woo'),
 				'desc_tip'    => true,
 			),
 			'enable_for_methods' => array(
@@ -155,8 +155,8 @@ class WC_Gateway_MundoPagos extends WC_Payment_Gateway
 				),
 			),
 			'enable_for_virtual' => array(
-				'title'   => __('Accept for virtual orders', 'payleo-payments-woo'),
-				'label'   => __('Accept payleo if the order is virtual', 'payleo-payments-woo'),
+				'title'   => __('Acepta pedidos virtuales ', 'payleo-payments-woo'),
+				'label'   => __('Acepta mundo pagos si el pedido es virtual ', 'payleo-payments-woo'),
 				'type'    => 'checkbox',
 				'default' => 'yes',
 			),
