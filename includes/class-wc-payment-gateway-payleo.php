@@ -91,7 +91,11 @@ class WC_Gateway_MundoPagos extends WC_Payment_Gateway
 		$this->form_fields = array(
 			'enabled'            => array(
 				'title'       => __('Habilitar/Deshabilitar', 'payleo-payments-woo'),
+<<<<<<< HEAD
 				'label'       => __('Habilitar Mundo pagos', 'payleo-payments-woo'),
+=======
+				'label'       => __('Enable Mundo pagos', 'payleo-payments-woo'),
+>>>>>>> 8017983ba55456a306d6af88cba9b64cfa135816
 				'type'        => 'checkbox',
 				'description' => '',
 				'default'     => 'no',
