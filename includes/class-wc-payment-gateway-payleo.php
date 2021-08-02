@@ -366,7 +366,7 @@ class WC_Gateway_MundoPagos extends WC_Payment_Gateway
 			$order_data['billing']['phone'],
 			$order_data['billing']['email'],
 			$order_data['billing']['address_1'],
-			$order_dta['billing']['country']
+			$order_data['billing']['country']
 		);
 		
 		$firm = $firm_init;
@@ -417,7 +417,7 @@ class WC_Gateway_MundoPagos extends WC_Payment_Gateway
 					'redirect' => $url
 				);
 			} else {
-				print_r ('Firms no valids!');
+				print_r ('Firm no valid!');
 			}
 		} else {
 			print_r($response);
@@ -464,78 +464,4 @@ class WC_Gateway_MundoPagos extends WC_Payment_Gateway
 			echo wp_kses_post(wpautop(wptexturize($this->instructions)) . PHP_EOL);
 		}
 	}
-
-
-	public function request()
-	{
-		// **NOTE**
-		//Before creating the connection with world payments, please create the corresponding order, invoice, etc. on your platform.
-		//So you can obtain the data that our platform requires for full operation. 
-	
-		//setup the request, you can also use CURLOPT_URL
-		$ch = curl_init('http://demo.mundoboletos.com:2525/commercial/api/shop-online/v1/peticion-pay');
-
-		// Returns the data/output as a string instead of raw data
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		// build firm with Id agreement, value_total in format double ex: 50.00, name product, currency, token security of agreement
-		// *NOTE: If value_total contains ',', parser ',' in '.'.
-		// Example
-		$firm = 'Id agreemen in mundo boletos' . ":" . 'Value total order/invoice' . ":" . 'Shorts example conection' . ":" . 'USD' . ":" . 'qwertyuiopasdfghjklzxcvbnm123456';
-		// Encrypt firm in SHA256 and send in paylaod
-		$firmSha256 = hash('sha256', $firm);
-		//BUILD A BUYERINFO WITH DATA OF BUYER 
-		$buyerinfo = array(
-			'first_name' => 'Buyer first name',
-			'last_name' => 'Buyer last name',
-			'phone' => 'Buyer phone',
-			'dni' => 'Buyer identification',
-			'email' => 'Buyer email',
-			'address' => 'Buyer address',
-			'country' => 'Buyer country'
-		);
-		//BUILD PAYLOAD AND SEND
-		$peticionPayShopOnline = array(
-			'buyerInfo' => $buyerinfo,
-			'value' => 'Value total order/invoice', // value total order/invoice
-			'tax' => 'Tax total order/invoice', // tax total order/invoice
-			'description' => 'Buy of ' . 'Name product' . ' in mundo boletos', //name product, name of producto in processing of pay
-			'tag' => 'Name product', //name product, name of producto in processing of pay
-			'codeReference' => 'Order/Invoice id', // identificator of order/invoice generate in your plataform
-			'codeAgreement' => 'Id agreemen in mundo boletos',
-			'firm' => $firmSha256, // firm buil and encrypt in SHA256
-			'others' => [] //optional
-		);
-		//Set your auth headers
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-			'Content-Type: application/json'
-		));
-		curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($peticionPayShopOnline));
-		// get stringified data/output. See CURLOPT_RETURNTRANSFER
-		$response = curl_exec($ch);
-		// get info about the request
-		$info = curl_getinfo($ch);
-		// // close curl resource to free up system resources
-		curl_close($ch);
-		$response = json_decode($response);
-		print_r ($peticionPayShopOnline);
-		//Start redirection to https://boletos.mundoboletos.com
-		if ($response->succes == true) {
-			$firmResponse = $response->data->firm; // ENCRYPT SHA256
-			$encryptSha256 = $firm . ":" . 'Order/Invoice id';
-			$sha256Firm = hash('sha256', $encryptSha256);
-			if ($sha256Firm == $firmResponse) {
-				$url =  "https://boletos.mundoboletos.com/payment/ecommerce-pay?params=" . $response->data->params;
-				// Return checkout  https://boletos.mundoboletos.com 
-				return array(
-					'result' => 'success',
-					'redirect' => $url
-					);
-				}
-		} else {
-		//SHOW ERROS IN RESPONSE.
-			print_r($response);
-		}
-		
-	}
-
 }
