@@ -78,8 +78,8 @@ class WC_Gateway_MundoPagos extends WC_Payment_Gateway
 		$this->method_title       = __( 'Mundo pagos', 'payleo-payments-woo' );
 		$this->token            = __( 'Token', 'payleo-payments-woo' );
 		$this->id_agreement          = __( 'Id convenio', 'payleo-payments-woo' );
-		$this->urlServiceConection            = __( 'urlServiceConection', 'payleo-payments-woo' );
-		$this->urlRedirect            = __( 'urlRedirect', 'payleo-payments-woo' );
+		$this->urlServiceConection            = __( 'Url conexion con servicio', 'payleo-payments-woo' );
+		$this->urlRedirect            = __( 'Url rediceccio', 'payleo-payments-woo' );
 		$this->method_description = __( 'Have your customers pay with Mundo pagos Payments.', 'payleo-payments-woo' );
 		$this->has_fields         = false;
 	}
@@ -345,20 +345,16 @@ class WC_Gateway_MundoPagos extends WC_Payment_Gateway
 		// Returns the data/output as a string instead of raw data
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		$product_name ="";
-		// Get the names of the items 
 		foreach($order->get_items() as $item) {
 			$product_name .= $item['name'] . "-". $item['product_id'] . " ";	
 		}
-		// build firm with Id agreement, value_total in format double ex: 50.00, name product, currency, token security of agreement
-		// *NOTE: If value_total contains ',', parser ',' in '.'.
-		// Example
 		$firm_init = $this->id_agreement . ":" .number_format($order->get_total(), 2, '.', ' ') . ":" . $product_name . ":" . $order->get_currency() . ":" . $this->token;
 		$firm_order = $firm_init . ":" . $order_data['order_key'];
-		// Encrypt firm in SHA256 and send in paylaod
 		$firmSha256_order = hash('sha256', $firm_order);
 		$order->update_meta_data('firm', $firmSha256_order);
+		
 		$order_data = $order->get_data();
-		//BUILD A BUYERINFO WITH DATA OF BUYER 
+
 		$buyerinfo = new BuyerInfo(
 			$order_data['billing']['first_name'],
 			$order_data['billing']['last_name'],
@@ -371,26 +367,29 @@ class WC_Gateway_MundoPagos extends WC_Payment_Gateway
 		
 		$firm = $firm_init;
 		$firmSha256 = hash('sha256', $firm);
-		//BUILD PAYLOAD AND SEND
-		$peticionPayShopOnline = array(
+		// print_r($firm_init);
+		
+		$data = array(
+			'value' => $order->get_total(),
+			'codeReference' => $this->id_agreement,
+			'tag' => $product_name,
+			'currency' => $order->get_currency(),
+			'description' => 'Compra de ' . $product_name . ' en woocommerce a mundo pagos',
+			'codeOrder' => $order_id,
+			'keyOrder' => $order_data['order_key']
+		);
+
+		$eCommercePeticionPay = array(
+			'data' => $data,
 			'buyerInfo' => $buyerinfo,
-			'value' => $order->get_total(),	// value total order/invoice
-			'tax' => $order->get_total_tax(), // tax total order/invoice,
-			'description' => 'Compra de ' . $product_name . ' en woocommerce a mundo boletos', //name product, name of producto in processing of pay,
-			'tag' => $product_name, //name product, name of producto in processing of pay
-			'codeReference' => $order_id,// identificator of order/invoice generate in your plataform
-			'codeAgreement' => $this->id_agreement,
-			'firm' => $firmSha256, // firm buil and encrypt in SHA256
-			'others' => [
-				'keyOrder' => $order_data['order_key'] //order_key create in woocommerce
-			]
+			'firm' => $firmSha256,
 		);
 		//Set your auth headers
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
 			'Content-Type: application/json',
 			// 'Authorization: Bearer ' . $token,
 		));
-		curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($peticionPayShopOnline));
+		curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($eCommercePeticionPay));
 		// get stringified data/output. See CURLOPT_RETURNTRANSFER
 		$response = curl_exec($ch);
 		// get info about the request
@@ -398,30 +397,29 @@ class WC_Gateway_MundoPagos extends WC_Payment_Gateway
 		// // close curl resource to free up system resources
 		curl_close($ch);
 		$response = json_decode($response);
-		//Start redirection to https://demo.mundoboletos.com:3232
+		print_r($eCommercePeticionPay);
+		print_r($response);
 		if ($response->status == 200) {
-			$firmResponse = $response->data->firm; // ENCRYPT SHA256
-			$codeReference = $response->data->data->codeReference;
+			$tkn = $response->data->firm;
+			$codeReference = $response->data->codeReference;
 			$order->update_meta_data('codeReference', $codeReference);
 			$encryptSha256 = $firm . ":" . $order_id;
-			$firmsha256 = hash('sha256', $encryptSha256);
-			//validate both firms for security of redirect 
-			if ($firmsha256 == $firmResponse) {
+			$sha256 = hash('sha256', $encryptSha256);
+			if ($sha256 == $tkn) {
 				$url = $this->urlRedirect . $response->data->params;
 				$order->update_status('pending', __('Esperando pago', 'woocommerce'));
 				// 	// Remove cart
 				$woocommerce->cart->empty_cart();
-				// Return checkout mundo boletos
+				// Return checkout mundo pagos
 				return array(
 					'result' => 'success',
 					'redirect' => $url
 				);
-			} else {
-				print_r ('Firm no valid!');
 			}
 		} else {
 			print_r($response);
 		}
+		
 	}
 
 	/**
